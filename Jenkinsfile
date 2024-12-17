@@ -18,13 +18,14 @@ pipeline {
 
         stage('Extract Jenkins Env File') {
             steps {
-                withCredentials([file(credentialsId: 'JENKINS_ENV_FILE', variable: 'JENKINS_ENV_FILE_PATH')]) {
+                withCredentials([string(credentialsId: 'JENKINS_ENV_SECRET', variable: 'JENKINS_ENV_FILE_CONTENT')]) {
                     script {
-                        // Dynamically load environment variables from the secret file
+                        writeFile file: '/tmp/.env', text: "${JENKINS_ENV_FILE_CONTENT}"
+                        
                         sh """
                             set -o allexport
-                            source ${JENKINS_ENV_FILE_PATH}
-                            set +o allexport
+                            . /tmp/.env
+                            unset allexport
                         """
                     }
                 }
