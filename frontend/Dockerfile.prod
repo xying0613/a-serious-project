@@ -1,0 +1,26 @@
+# Build Stage
+FROM node:18-alpine AS BUILD
+
+WORKDIR /var/src/app_build
+
+COPY . .
+
+RUN npm install && \
+    npm run build
+
+# Production Stage
+FROM node:18-alpine
+
+WORKDIR /var/src/app
+
+COPY --from=build /var/src/app_build/package.json /var/src/app_build/package-lock.json ./
+COPY --from=build /var/src/app_build/dist ./dist
+COPY --from=build /var/src/app_build/public ./public
+
+RUN npm install -g vite && \
+    npm install --omit=dev && \
+    rm -rf /var/cache/apk/*
+
+EXPOSE 4173
+
+CMD ["npm", "run", "serve"]
