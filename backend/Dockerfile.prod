@@ -1,0 +1,22 @@
+# TODO: Remove --platform=linux/amd64 if not using macOS
+FROM --platform=linux/amd64 node:22-slim
+
+WORKDIR /app
+
+RUN apt-get update -y && apt-get install -y openssl
+
+COPY package*.json ./
+
+RUN npm install
+
+COPY . .
+
+COPY .env.prod .env
+
+RUN npx prisma generate
+
+EXPOSE 3000
+
+ENTRYPOINT ["docker-entrypoint.sh"]
+
+CMD ["node", "index.js"]
