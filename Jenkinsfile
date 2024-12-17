@@ -2,11 +2,11 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_REGISTRY = "${env.DOCKER_REGISTRY}"
-        IMAGE_NAME = "${env.IMAGE_NAME}"
-        TAG_NAME = "${env.TAG_NAME}"
-        EC2_IP = "${env.EC2_IP}"
-        SSH_CREDENTIALS = "${env.SSH_CREDENTIALS}"
+        DOCKER_REGISTRY = ''
+        IMAGE_NAME = ''
+        TAG_NAME = ''
+        EC2_IP = ''
+        SSH_CREDENTIALS = ''
     }
 
     stages {
@@ -16,13 +16,32 @@ pipeline {
             }
         }
 
+        stage('Extract Jenkins Env File') {
+            steps {
+                withCredentials([file(credentialsId: 'JENKINS_ENV_FILE', variable: 'JENKINS_ENV_FILE_PATH')]) {
+                    script {
+                        // Dynamically load environment variables from the secret file
+                        sh """
+                            set -o allexport
+                            source ${JENKINS_ENV_FILE_PATH}
+                            set +o allexport
+                        """
+                    }
+                }
+            }
+        }
+
         stage('Build Docker Images') {
             parallel {
                 stage('Build Frontend (Production)') {
                     steps {
                         dir('frontend') {
-                            script {
-                                docker.build("${IMAGE_NAME}-frontend:${TAG_NAME}", '-f Dockerfile.prod .')
+                            withCredentials([string(credentialsId: 'FRONTEND_ENV_PROD', variable: 'FRONTEND_ENV_CONTENT')]) {
+                                script {
+                                    writeFile file: '.env', text: "${FRONTEND_ENV_CONTENT}"
+                                    docker.build("${IMAGE_NAME}-frontend:${TAG_NAME}", '-f Dockerfile.prod .')
+                                    sh 'rm -f .env'
+                                }
                             }
                         }
                     }
@@ -30,8 +49,12 @@ pipeline {
                 stage('Build Backend (Production)') {
                     steps {
                         dir('backend') {
-                            script {
-                                docker.build("${IMAGE_NAME}-backend:${TAG_NAME}", '-f Dockerfile.prod .')
+                            withCredentials([string(credentialsId: 'BACKEND_ENV_PROD', variable: 'BACKEND_ENV_CONTENT')]) {
+                                script {
+                                    writeFile file: '.env', text: "${BACKEND_ENV_CONTENT}"
+                                    docker.build("${IMAGE_NAME}-backend:${TAG_NAME}", '-f Dockerfile.prod .')
+                                    sh 'rm -f .env'
+                                }
                             }
                         }
                     }
