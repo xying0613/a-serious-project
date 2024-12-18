@@ -7,7 +7,7 @@ const apiUrl = import.meta.env.API_URL;
 const name = ref('');
 const handleSubmit = async () => {
   if (name.value) {
-    const response = await axios.post(`${apiBaseUrl}/api/users`, { name: name.value });
+    const response = await axios.post(`${apiUrl}/api/users`, { name: name.value });
     alert(`Hello, ${response.data.name}! User created successfully.`);
   }
 };
