@@ -16,6 +16,6 @@ RUN npx prisma generate
 
 EXPOSE 3000
 
-ENTRYPOINT ["docker-entrypoint.sh"]
+RUN chmod +x /app/docker-entrypoint.sh
 
-CMD ["node", "index.js"]
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
