@@ -2,33 +2,17 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_REGISTRY = ''
-        IMAGE_NAME = ''
-        TAG_NAME = ''
-        EC2_IP = ''
-        SSH_CREDENTIALS = ''
+        DOCKER_REGISTRY = 'docker.io'
+        IMAGE_NAME = 'xyhaw/a-serious-project'
+        TAG_NAME = 'v1.0.0'
+        EC2_IP = '54.252.234.128'
+        SSH_CREDENTIALS = 'ec2-user'
     }
 
     stages {
         stage('Checkout') {
             steps {
                 checkout scm
-            }
-        }
-
-        stage('Extract Jenkins Env File') {
-            steps {
-                withCredentials([string(credentialsId: 'JENKINS_ENV_SECRET', variable: 'JENKINS_ENV_FILE_CONTENT')]) {
-                    script {
-                        writeFile file: '/tmp/.env', text: "${JENKINS_ENV_FILE_CONTENT}"
-                        
-                        sh """
-                            set -o allexport
-                            . /tmp/.env
-                            unset allexport
-                        """
-                    }
-                }
             }
         }
 
