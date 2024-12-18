@@ -10,7 +10,7 @@ const showPopup = ref(false);
 
 const fetchVisitors = async () => {
   try {
-    const response = await axios.get(`${apiBaseUrl}/api/users`);
+    const response = await axios.get(`${apiUrl}/api/users`);
     visitors.value = response.data;
   } catch (error) {
     console.error('Error fetching visitors:', error);
