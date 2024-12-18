@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 
-const apiUrl = import.meta.env.API_URL;
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const visitors = ref<{ id: number; name: string }[]>([]);
 const selectedVisitor = ref<string | null>(null);
