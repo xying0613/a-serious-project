@@ -26,7 +26,6 @@ services:
     ports:
       - "4173:4173"
     volumes:
-      - ./frontend:/app
       - /app/node_modules
     environment:
       NODE_ENV: production
@@ -39,7 +38,6 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./backend:/app
       - /app/node_modules
     environment:
       - NODE_ENV=production
